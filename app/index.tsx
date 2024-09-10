@@ -1,11 +1,11 @@
-import {  Image, Text, View, ScrollView } from "react-native";
+import {Image, Text, View, FlatList, ListRenderItem} from "react-native";
 interface Card {
   title: string;
   subTitle: string;
   backgroundColor: string;
   image: any;
 }
-const DATA: Card[] = [
+const cards: Card[] = [
   {title: 'Titolo 1', subTitle: 'Descrizione 1', backgroundColor: 'yellow', image: require('../assets/images/group.jpg')},
   {title: 'Titolo 2', subTitle: 'Descrizione 2', backgroundColor: 'green', image: require('../assets/images/group.jpg')},
   {title: 'Titolo 3', subTitle: 'Descrizione 3', backgroundColor: 'red', image: require('../assets/images/group.jpg')},
@@ -19,7 +19,6 @@ const Card = ({title, subTitle, backgroundColor, image}: Card) => {
     borderRadius: 15,
     flexDirection: 'row',
     backgroundColor: backgroundColor ?? 'aqua',
-    marginBottom: 16,
     }}>
 
       {/* IMAGE */}
@@ -27,7 +26,7 @@ const Card = ({title, subTitle, backgroundColor, image}: Card) => {
         flex: 1,
       justifyContent: 'center',
       alignItems: 'center'}}>
-        <Image 
+        <Image
         source={image ?? require('../assets/images/logo.jpg')}
         style={{
           width: 130,
@@ -51,29 +50,44 @@ const Card = ({title, subTitle, backgroundColor, image}: Card) => {
   </View>
 }
 
+const renderItem: ListRenderItem<Card> =  ({item, index})  => {
+  return (
+      <Card
+    key={index}
+    title={item.title}
+    subTitle={item.subTitle}
+    backgroundColor={item.backgroundColor}
+    image={item.image}
+/>
+  )
+}
+const ItemSeparatorComponent = () => <View style={{height: 16}}/>
+const ListHeaderComponent = () => {
+  return <Text style={{fontSize: 24, paddingVertical: 16, textAlign: 'center'}}>Le card di oggi: </Text>
+}
+const ListFooterComponent = () => {
+  return <Text style={{fontSize: 24, paddingVertical: 16, textAlign: 'center'}}>Fine della lista</Text>
+}
+
+const ListEmptyComponent = () => {
+  return <Text style={{fontSize: 24, paddingVertical: 16, textAlign: 'center'}}>Nessuna card da mostrare</Text>
+}
+
 
 export default function Index() {
-  return (
-    <ScrollView style={{
-      flex: 1,
-      paddingHorizontal: 16
-    }}>
+  return (<>
 
-    {/* INIT CARD */}
-    {DATA.map((card, index)=> {
-    return (
-      <Card
-        key={index}
-        title={card.title} 
-        subTitle={card.subTitle}
-        backgroundColor={card.backgroundColor}
-        image={card.image}
-        />
-      )
-    })}
-      {/* END CARD */}
-      
-    </ScrollView>
+        <FlatList
+            style={{flex: 1}}
+            bounces={false}
+            data={cards}
+            renderItem={renderItem}
+            ItemSeparatorComponent={ItemSeparatorComponent}
+            ListHeaderComponent={ListHeaderComponent}
+            ListFooterComponent={ListFooterComponent}
+            ListEmptyComponent={ListEmptyComponent}
+            />
 
+  </>
   );
 }
