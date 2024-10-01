@@ -1,28 +1,31 @@
+import React from 'react';
 import { Text, View } from 'react-native';
 import { ButtonComponent } from '@/components/atoms/button/button.atom';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 
-const MULTIPIER = 5;
 export default function Index() {
-  const [text, setText] = useState(0);
+  const [name, setName] = useState('Mario');
 
   // ** CALLBACKS  ** //
-  const onIncrementByOne = () => {
-    setText((prevText) => prevText + 1);
+  const onChangeName = () => {
+    setName('Luigi');
   };
-  const onIncrementByFive = () => {
-    for (let i = 0; i < MULTIPIER; i++) {
-      onIncrementByOne();
-    }
-  };
+
+  console.log('name', name);
+
+  const user = useMemo(() => {
+    return {
+      name: name,
+      surname: 'Rossi',
+      age: 25,
+    };
+  }, [name]);
 
   // ** UI  ** //
   return (
     <View style={{ flex: 1, justifyContent: 'center' }}>
-      <Text style={{ fontSize: 18, paddingVertical: 32, textAlign: 'center' }}>{text}</Text>
-      <ButtonComponent title="Cliccami" onPress={onIncrementByOne} />
-
-      <ButtonComponent title="Cliccami" onPress={onIncrementByFive} />
+      <Text style={{ fontSize: 18, paddingVertical: 32, textAlign: 'center' }}>{user.name}</Text>
+      <ButtonComponent title="Cliccami" onPress={onChangeName} />
     </View>
   );
 }
