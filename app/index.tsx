@@ -1,37 +1,28 @@
 import { Text, View } from 'react-native';
 import { ButtonComponent } from '@/components/atoms/button/button.atom';
 import { useState } from 'react';
-import { TextInputComponent } from '@/components/atoms/textInput/textInput.atom';
 
+const MULTIPIER = 5;
 export default function Index() {
-  const [text, setText] = useState('');
-  const [isConfirmPressed, setIsConfirmPressed] = useState(false);
+  const [text, setText] = useState(0);
 
   // ** CALLBACKS  ** //
-  const onChangeText = (text: string) => setText(text);
-  const onPress = () => {
-    setIsConfirmPressed(true);
+  const onIncrementByOne = () => {
+    setText((prevText) => prevText + 1);
   };
-
-  const onReset = () => {
-    setText('');
-    setIsConfirmPressed(false);
+  const onIncrementByFive = () => {
+    for (let i = 0; i < MULTIPIER; i++) {
+      onIncrementByOne();
+    }
   };
 
   // ** UI  ** //
   return (
     <View style={{ flex: 1, justifyContent: 'center' }}>
-      <TextInputComponent value={text} onChangeText={onChangeText} />
-      {isConfirmPressed ? (
-        <Text style={{ fontSize: 18, paddingVertical: 32, textAlign: 'center' }}>{text}</Text>
-      ) : null}
-      <Text style={{ fontSize: 18, paddingVertical: 32, textAlign: 'center' }}></Text>
-      <ButtonComponent title="Cliccami" onPress={onPress} />
-      <ButtonComponent
-        style={{ marginTop: 16, backgroundColor: 'red' }}
-        title="Reset"
-        onPress={onReset}
-      />
+      <Text style={{ fontSize: 18, paddingVertical: 32, textAlign: 'center' }}>{text}</Text>
+      <ButtonComponent title="Cliccami" onPress={onIncrementByOne} />
+
+      <ButtonComponent title="Cliccami" onPress={onIncrementByFive} />
     </View>
   );
 }
