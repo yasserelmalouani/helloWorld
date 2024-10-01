@@ -4,16 +4,15 @@ import { styles } from '@/components/atoms/button/button.styles';
 
 interface ButtonProps {
   title: string;
-  disabled: boolean;
+  disabled?: boolean;
   style?: ViewStyle;
   titleStyle?: TextStyle;
   activeOpacity?: number;
   onPress: () => void;
 }
-
 export const ButtonComponent = ({
   title,
-  disabled,
+  disabled = false,
   style,
   titleStyle,
   activeOpacity = 0.7,
