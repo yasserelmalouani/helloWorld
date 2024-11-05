@@ -1,6 +1,6 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { RowItemMolecule } from '@/components/molecules/rowItem/rowItem.molecule';
-import { Button, FlatList, ListRenderItem, TextInput, View } from 'react-native';
+import { Button, ListRenderItem, TextInput, View, FlatList } from 'react-native';
 import { styles } from '@/app/styles';
 
 interface Task {
@@ -9,10 +9,18 @@ interface Task {
   isCompleted: boolean;
 }
 
+enum Filter {
+  ALL = 'ALL',
+  COMPLETED = 'COMPLETED',
+  NOT_COMPLETED = 'NOT_COMPLETED',
+}
+
 export default function Index() {
   const [userTask, setUserTask] = useState('');
   const [tasks, setTasks] = useState<Task[]>([]);
   const [isTextInputFullFilled, setIsTextInputFullFilled] = useState(false);
+  const [filter, setFilter] = useState<Filter>(Filter.ALL);
+  const [filteredTasks, setFilteredTasks] = useState<Task[]>();
 
   // ** CALLBACKS  ** //
   const addTask = useCallback(() => {
@@ -48,6 +56,39 @@ export default function Index() {
     });
   }, []);
 
+  const setAll = () => {
+    setFilter(Filter.ALL);
+  };
+
+  const setCompleted = () => {
+    setFilter(Filter.COMPLETED);
+  };
+
+  const setNotCompleted = () => {
+    setFilter(Filter.NOT_COMPLETED);
+  };
+
+  // ** USE EFFECTS ** //
+  useEffect(() => {
+    if (filter === Filter.ALL) {
+      setFilteredTasks(tasks);
+      return;
+    }
+
+    if (filter === Filter.COMPLETED) {
+      const completedTasks = tasks.filter((task) => {
+        return task.isCompleted;
+      });
+      setFilteredTasks(completedTasks);
+      return;
+    }
+
+    const notCompletedTasks = tasks.filter((task) => {
+      return !task.isCompleted;
+    });
+    setFilteredTasks(notCompletedTasks);
+  }, [filter, tasks]);
+
   // ** UI  ** //
   const renderItem: ListRenderItem<Task> = useCallback(
     ({ item }) => {
@@ -61,7 +102,7 @@ export default function Index() {
     },
     [manageTask]
   );
-
+  console.warn('selected filter => ', filter);
   return (
     <View style={styles.container}>
       <View style={styles.textInputContainer}>
@@ -72,7 +113,25 @@ export default function Index() {
         />
         <Button title={'Add'} onPress={addTask} />
       </View>
-      <FlatList data={tasks} renderItem={renderItem} />
+
+      {/* VIEW CONTAINER FOR FILTERS BUTTONS*/}
+      <View style={styles.filtersContainer}>
+        <View style={[styles.buttonStyle, filter === Filter.ALL ? styles.activeFilter : null]}>
+          <Button title={'ALL'} onPress={setAll} />
+        </View>
+        <View
+          style={[styles.buttonStyle, filter === Filter.COMPLETED ? styles.activeFilter : null]}>
+          <Button title={'Completed'} onPress={setCompleted} />
+        </View>
+        <View
+          style={[
+            styles.buttonStyle,
+            filter === Filter.NOT_COMPLETED ? styles.activeFilter : null,
+          ]}>
+          <Button title={'Not completed'} onPress={setNotCompleted} />
+        </View>
+      </View>
+      <FlatList data={filteredTasks} renderItem={renderItem} />
     </View>
   );
 }

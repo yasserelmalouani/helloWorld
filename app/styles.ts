@@ -25,4 +25,17 @@ export const styles = StyleSheet.create({
   textInputContainer: {
     flexDirection: 'row',
   },
+  filtersContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-evenly',
+  },
+  buttonStyle: {
+    borderWidth: 1,
+    borderColor: 'rgb(51,184,196)',
+    padding: 8,
+    borderRadius: 10,
+  },
+  activeFilter: {
+    borderColor: 'red',
+  },
 });
