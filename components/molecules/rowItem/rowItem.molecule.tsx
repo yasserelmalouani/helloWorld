@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, Pressable } from 'react-native';
+import { View, Text, TouchableOpacity } from 'react-native';
 import { styles } from '@/components/molecules/rowItem/rowItem.styles';
 interface RowItemMoleculeProps {
   title: string;
@@ -9,11 +9,11 @@ interface RowItemMoleculeProps {
 
 export const RowItemMolecule = ({ title, isCompleted, onPress }: RowItemMoleculeProps) => {
   return (
-    <Pressable onPress={onPress}>
+    <TouchableOpacity onPress={onPress}>
       <View style={styles.container}>
         <View style={isCompleted ? styles.checkBoxCompleted : styles.checkBoxEmpty}></View>
         <Text style={styles.title}>{title}</Text>
       </View>
-    </Pressable>
+    </TouchableOpacity>
   );
 };

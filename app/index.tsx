@@ -42,19 +42,27 @@ export default function Index() {
     setIsTextInputFullFilled(true);
   }, [userTask]);
 
-  const manageTask = useCallback((id: string) => {
-    setTasks((prevState) => {
-      return prevState.map((task) => {
-        if (task.id === id) {
-          return {
-            ...task,
-            isCompleted: true,
-          };
-        }
-        return task;
+  const manageTask = useCallback(
+    (id: string) => {
+      setTasks((prevState) => {
+        const mappedTasks = prevState.map((task) => {
+          if (task.id === id) {
+            return {
+              ...task,
+              isCompleted: true,
+            };
+          }
+          return task;
+        });
+        return mappedTasks.filter((task) => {
+          const shouldRemoveTask =
+            task.id === id && filter === Filter.COMPLETED && task.isCompleted;
+          return !shouldRemoveTask;
+        });
       });
-    });
-  }, []);
+    },
+    [filter]
+  );
 
   const setAll = () => {
     setFilter(Filter.ALL);
@@ -89,6 +97,8 @@ export default function Index() {
     setFilteredTasks(notCompletedTasks);
   }, [filter, tasks]);
 
+  useEffect(() => {}, []);
+
   // ** UI  ** //
   const renderItem: ListRenderItem<Task> = useCallback(
     ({ item }) => {
@@ -102,7 +112,7 @@ export default function Index() {
     },
     [manageTask]
   );
-  console.warn('selected filter => ', filter);
+
   return (
     <View style={styles.container}>
       <View style={styles.textInputContainer}>
