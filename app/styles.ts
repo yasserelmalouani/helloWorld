@@ -3,8 +3,7 @@ import { StyleSheet } from 'react-native';
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: 16,
-    paddingTop: 32,
+    padding: 16,
   },
   textInput: {
     flex: 1,

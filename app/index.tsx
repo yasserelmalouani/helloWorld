@@ -1,12 +1,20 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { RowItemMolecule } from '@/components/molecules/rowItem/rowItem.molecule';
-import { Button, ListRenderItem, TextInput, View, FlatList } from 'react-native';
+import { Button, ListRenderItem, View, FlatList } from 'react-native';
 import { styles } from '@/app/styles';
 
 interface Task {
-  id: string;
-  title: string;
-  isCompleted: boolean;
+  completed: boolean;
+  id: number;
+  todo: string;
+  userId: number;
+}
+
+interface Result {
+  limit: number;
+  skip: number;
+  todos: Task[];
+  total: number;
 }
 
 enum Filter {
@@ -16,52 +24,47 @@ enum Filter {
 }
 
 export default function Index() {
-  const [userTask, setUserTask] = useState('');
   const [tasks, setTasks] = useState<Task[]>([]);
-  const [isTextInputFullFilled, setIsTextInputFullFilled] = useState(false);
   const [filter, setFilter] = useState<Filter>(Filter.ALL);
-  const [filteredTasks, setFilteredTasks] = useState<Task[]>();
+
+  // ** DATA ** //
+  const filteredTodos = useMemo(() => {
+    if (filter === Filter.ALL) {
+      return tasks;
+    }
+    if (filter === Filter.COMPLETED) {
+      return tasks.filter((task) => task.completed);
+    }
+    return tasks.filter((task) => !task.completed);
+  }, [filter, tasks]);
 
   // ** CALLBACKS  ** //
-  const addTask = useCallback(() => {
-    if (!userTask.length) {
-      return;
-    }
-
-    setTasks((prevState) => {
-      return [
-        ...prevState,
-        {
-          id: new Date().valueOf().toString(),
-          title: userTask,
-          isCompleted: false,
-        },
-      ];
-    });
-    setUserTask('');
-    setIsTextInputFullFilled(true);
-  }, [userTask]);
-
   const manageTask = useCallback(
-    (id: string) => {
-      setTasks((prevState) => {
-        const mappedTasks = prevState.map((task) => {
-          if (task.id === id) {
-            return {
-              ...task,
-              isCompleted: true,
-            };
-          }
-          return task;
+    (id: number) => {
+      const taskToEdit = tasks.find((task) => task.id === id);
+      if (!taskToEdit) {
+        return;
+      }
+      fetch(`https://dummyjson.com/todos/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          completed: !taskToEdit.completed,
+        }),
+      })
+        .then((res) => res.json())
+        .then((result) => {
+          setTasks((prevTasks) => {
+            return prevTasks.map((task) => {
+              if (task.id === result.id) {
+                return result;
+              }
+              return task;
+            });
+          });
         });
-        return mappedTasks.filter((task) => {
-          const shouldRemoveTask =
-            task.id === id && filter === Filter.COMPLETED && task.isCompleted;
-          return !shouldRemoveTask;
-        });
-      });
     },
-    [filter]
+    [tasks]
   );
 
   const setAll = () => {
@@ -78,34 +81,19 @@ export default function Index() {
 
   // ** USE EFFECTS ** //
   useEffect(() => {
-    if (filter === Filter.ALL) {
-      setFilteredTasks(tasks);
-      return;
-    }
-
-    if (filter === Filter.COMPLETED) {
-      const completedTasks = tasks.filter((task) => {
-        return task.isCompleted;
-      });
-      setFilteredTasks(completedTasks);
-      return;
-    }
-
-    const notCompletedTasks = tasks.filter((task) => {
-      return !task.isCompleted;
-    });
-    setFilteredTasks(notCompletedTasks);
-  }, [filter, tasks]);
-
-  useEffect(() => {}, []);
+    // save data on init screen cause empty deps
+    fetch('https://dummyjson.com/todos')
+      .then((res) => res.json())
+      .then((result: Result) => setTasks(result.todos));
+  }, []);
 
   // ** UI  ** //
   const renderItem: ListRenderItem<Task> = useCallback(
     ({ item }) => {
       return (
         <RowItemMolecule
-          title={item.title}
-          isCompleted={item.isCompleted}
+          title={item.todo}
+          isCompleted={item.completed}
           onPress={() => manageTask(item.id)}
         />
       );
@@ -115,15 +103,6 @@ export default function Index() {
 
   return (
     <View style={styles.container}>
-      <View style={styles.textInputContainer}>
-        <TextInput
-          style={isTextInputFullFilled ? styles.textInput : styles.emptyTextInput}
-          value={userTask}
-          onChangeText={setUserTask}
-        />
-        <Button title={'Add'} onPress={addTask} />
-      </View>
-
       {/* VIEW CONTAINER FOR FILTERS BUTTONS*/}
       <View style={styles.filtersContainer}>
         <View style={[styles.buttonStyle, filter === Filter.ALL ? styles.activeFilter : null]}>
@@ -141,7 +120,7 @@ export default function Index() {
           <Button title={'Not completed'} onPress={setNotCompleted} />
         </View>
       </View>
-      <FlatList data={filteredTasks} renderItem={renderItem} />
+      <FlatList data={filteredTodos} renderItem={renderItem} />
     </View>
   );
 }
