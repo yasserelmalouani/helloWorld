@@ -1,10 +1,20 @@
 import { StyleSheet } from 'react-native';
 
 export const styles = StyleSheet.create({
+  rowContainer: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
   container: {
+    paddingVertical: 12,
+    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    height: 45,
+  },
+  imageContainer: {
+    alignItems: 'flex-end',
   },
   checkBoxCompleted: {
     borderWidth: 1,
@@ -20,8 +30,12 @@ export const styles = StyleSheet.create({
     width: 30,
   },
   title: {
-    fontSize: 24,
+    fontSize: 18,
     fontWeight: 'semibold',
-    paddingLeft: 24,
+    paddingLeft: 12,
+  },
+  trashIcon: {
+    height: 24,
+    width: 24,
   },
 });

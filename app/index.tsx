@@ -39,6 +39,18 @@ export default function Index() {
   }, [filter, tasks]);
 
   // ** CALLBACKS  ** //
+  const setAll = () => {
+    setFilter(Filter.ALL);
+  };
+
+  const setCompleted = () => {
+    setFilter(Filter.COMPLETED);
+  };
+
+  const setNotCompleted = () => {
+    setFilter(Filter.NOT_COMPLETED);
+  };
+
   const manageTask = useCallback(
     (id: number) => {
       const taskToEdit = tasks.find((task) => task.id === id);
@@ -67,17 +79,31 @@ export default function Index() {
     [tasks]
   );
 
-  const setAll = () => {
-    setFilter(Filter.ALL);
-  };
-
-  const setCompleted = () => {
-    setFilter(Filter.COMPLETED);
-  };
-
-  const setNotCompleted = () => {
-    setFilter(Filter.NOT_COMPLETED);
-  };
+  const onDeleteTaskPress = useCallback((id: number) => {
+    fetch(`https://dummyjson.com/todos/${id}`, {
+      method: 'DELETE',
+    })
+      .then((res) => res.json())
+      .then(
+        (result: {
+          id: number;
+          todo: string;
+          completed: boolean;
+          userId: number;
+          isDeleted: boolean;
+          deletedOn: string;
+        }) => {
+          setTasks((prevState) => {
+            return prevState.filter((task) => {
+              if (result.isDeleted && result.id === task.id) {
+                return;
+              }
+              return task;
+            });
+          });
+        }
+      );
+  }, []);
 
   // ** USE EFFECTS ** //
   useEffect(() => {
@@ -95,10 +121,11 @@ export default function Index() {
           title={item.todo}
           isCompleted={item.completed}
           onPress={() => manageTask(item.id)}
+          onDelete={() => onDeleteTaskPress(item.id)}
         />
       );
     },
-    [manageTask]
+    [manageTask, onDeleteTaskPress]
   );
 
   return (
@@ -120,7 +147,7 @@ export default function Index() {
           <Button title={'Not completed'} onPress={setNotCompleted} />
         </View>
       </View>
-      <FlatList data={filteredTodos} renderItem={renderItem} />
+      <FlatList showsVerticalScrollIndicator={false} data={filteredTodos} renderItem={renderItem} />
     </View>
   );
 }
