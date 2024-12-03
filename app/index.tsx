@@ -1,7 +1,14 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { FlatList, ListRenderItem, Text, View } from 'react-native';
+import { FlatList, ListRenderItem, View } from 'react-native';
 import { styles } from '@/app/styles';
+import CartCard from '@/components/molecules/cartCard/cartCard.molecule';
 
+interface Response {
+  carts: Cart[];
+  total: number;
+  skip: number;
+  limit: number;
+}
 interface Product {
   id: number;
   title: string;
@@ -13,7 +20,7 @@ interface Product {
   thumbnail: string;
 }
 
-interface Cart {
+export interface Cart {
   id: number;
   products: Product[];
   total: number;
@@ -23,20 +30,15 @@ interface Cart {
   totalQuantity: number;
 }
 
-interface Response {
-  carts: Cart[];
-  total: number;
-  skip: number;
-  limit: number;
-}
-
 export default function Index() {
   const [carts, setCarts] = useState<Cart[]>([]);
 
   // ** CALLBACKS ** //
   const renderItem = useCallback<ListRenderItem<Cart>>(({ item }) => {
-    return <Text>{item.id}</Text>;
+    return <CartCard cart={item} />;
   }, []);
+
+  const ItemSeparatorComponent = useCallback(() => <View style={{ height: 20 }}></View>, []);
 
   // ** USE EFFECT ** //
   useEffect(() => {
@@ -47,7 +49,12 @@ export default function Index() {
 
   return (
     <View style={styles.container}>
-      <FlatList showsVerticalScrollIndicator={false} data={carts} renderItem={renderItem} />
+      <FlatList
+        showsVerticalScrollIndicator={false}
+        ItemSeparatorComponent={ItemSeparatorComponent}
+        data={carts}
+        renderItem={renderItem}
+      />
     </View>
   );
 }
