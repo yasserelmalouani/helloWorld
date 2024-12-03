@@ -5,9 +5,10 @@ import styles from '@/components/molecules/cartCard/cartCard.styles';
 
 interface CartCardProps {
   cart: Cart;
+  onPress: () => void;
 }
 
-const CartCard = ({ cart }: CartCardProps) => {
+const CartCard = ({ cart, onPress }: CartCardProps) => {
   return (
     <>
       <View style={styles.container}>
@@ -26,7 +27,7 @@ const CartCard = ({ cart }: CartCardProps) => {
         </Text>
       </View>
 
-      <TouchableOpacity style={styles.buyCartButton} onPress={console.warn}>
+      <TouchableOpacity style={styles.buyCartButton} onPress={onPress}>
         <Text style={styles.genericCardText}>BUY CART {cart.discountedTotal} $</Text>
       </TouchableOpacity>
     </>
