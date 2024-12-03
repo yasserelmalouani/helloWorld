@@ -7,7 +7,7 @@ interface CartCardProps {
   cart: Cart;
 }
 
-const CartCard = memo<CartCardProps>(({ cart }) => {
+const CartCard = ({ cart }: CartCardProps) => {
   return (
     <>
       <View style={styles.container}>
@@ -31,6 +31,6 @@ const CartCard = memo<CartCardProps>(({ cart }) => {
       </TouchableOpacity>
     </>
   );
-});
+};
 
-export default CartCard;
+export default memo(CartCard);
